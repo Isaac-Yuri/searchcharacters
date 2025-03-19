@@ -1,38 +1,37 @@
 package com.isaac.searchcharacters.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.isaac.searchcharacters.model.Character;
 import com.isaac.searchcharacters.repository.CharacterRepository;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.time.Duration;
+import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class CharacterService {
 
-    private final CharacterRepository repository;
+    @Autowired
+    private CharacterRepository characterRepository;
 
-    public List<Character> getAll() {
-        return (List<Character>) repository.findAll();
+    public void saveCharacter(Character character) throws SolrServerException, IOException {
+        characterRepository.save(character);
     }
 
-    public Optional<Character> getById(String id) {
-        return repository.findById(id);
+    public List<Character> getAllCharacters() throws SolrServerException, IOException {
+        return characterRepository.findAll();
     }
 
-    public List<Character> searchByName(String name) {
-        return repository.findByNameContaining(name);
+    public Character getCharacterById(String id) throws SolrServerException, IOException {
+        return characterRepository.findById(id);
     }
 
-    public Character save(Character character) {
-        Duration duration = Duration.ofSeconds(1);
-        return repository.save(character, duration);
+    public List<Character> getCharactersByName(String name) throws SolrServerException, IOException {
+        return characterRepository.findByName(name);
     }
 
-    public void delete(String id) {
-        repository.deleteById(id);
+    public void deleteCharacter(String id) throws SolrServerException, IOException {
+        characterRepository.deleteById(id);
     }
 }

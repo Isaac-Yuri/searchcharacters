@@ -1,58 +1,43 @@
 package com.isaac.searchcharacters.controllers;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import com.isaac.searchcharacters.model.Character;
+import com.isaac.searchcharacters.service.CharacterService;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.isaac.searchcharacters.service.CharacterService;
-import com.isaac.searchcharacters.model.Character;
-
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/characters")
-@RequiredArgsConstructor
 public class CharacterController {
 
-    private final CharacterService service;
+    @Autowired
+    private CharacterService characterService;
+
+    @PostMapping
+    public void addCharacter(@RequestBody Character character) throws SolrServerException, IOException {
+        characterService.saveCharacter(character);
+    }
 
     @GetMapping
-    public List<Character> getAll() {
-        return service.getAll();
+    public List<Character> getAllCharacters() throws SolrServerException, IOException {
+        return characterService.getAllCharacters();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Character> getById(@PathVariable String id) {
-        return service.getById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Character getCharacterById(@PathVariable String id) throws SolrServerException, IOException {
+        return characterService.getCharacterById(id);
     }
 
     @GetMapping("/search")
-    public List<Character> search(@RequestParam String name) {
-        return service.searchByName(name);
-    }
-
-    @PostMapping
-    public Character create(@RequestBody Character character) {
-        return service.save(character);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Character> update(@PathVariable String id, @RequestBody Character character) {
-        if (!service.getById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        character.setId(id);
-        return ResponseEntity.ok(service.save(character));
+    public List<Character> searchByName(@RequestParam String name) throws SolrServerException, IOException {
+        return characterService.getCharactersByName(name);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        if (!service.getById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        service.delete(id);
-        return ResponseEntity.noContent().build();
+    public void deleteCharacter(@PathVariable String id) throws SolrServerException, IOException {
+        characterService.deleteCharacter(id);
     }
 }

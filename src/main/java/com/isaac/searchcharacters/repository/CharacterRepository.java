@@ -21,14 +21,16 @@ public class CharacterRepository {
     private SolrClient solrClient;
 
     public void save(Character character) throws SolrServerException, IOException {
+        character.generateId();
+
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("id", character.getId());
         doc.addField("name", character.getName());
         doc.addField("anime", character.getAnime());
         doc.addField("description", character.getDescription());
 
-        solrClient.add(doc);
-        solrClient.commit();
+        solrClient.add(doc); 
+        solrClient.commit();   
     }
 
     public List<Character> findAll() throws SolrServerException, IOException {
@@ -64,6 +66,13 @@ public class CharacterRepository {
 
     public Character convertDocumentToCharacter(SolrDocument document) {
         Character character = new Character();
+
+        if (document.getFieldValue("id") instanceof ArrayList) {
+            ArrayList<String> names = (ArrayList<String>) document.getFieldValue("id");
+            character.setId(names.get(0)); 
+        } else {
+            character.setId((String) document.getFieldValue("id"));
+        }
         
         if (document.getFieldValue("name") instanceof ArrayList) {
             ArrayList<String> names = (ArrayList<String>) document.getFieldValue("name");

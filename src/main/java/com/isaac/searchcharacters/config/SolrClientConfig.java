@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SolrClientConfig {
 
-    private static final String SOLR_URL = "http://localhost:8983/solr/anime_characters";
+    private static final String SOLR_URL = "http://localhost:8983/solr/characters";
 
     @Bean
     public SolrClient solrClient() {
